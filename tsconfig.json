@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    /* Specify library files to be included in the compilation: */
+    "lib": [
+      "esnext"
+    ],
+    /* Generates corresponding '.map' file. */
+    "sourceMap": true,
+    /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    /* List of folders to include type definitions from. */
+    "types": [
+      "jest",
+      "node",
+      "hapi__hapi",
+      "jest",
+      "lodash"
+    ],
+    /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+  }
+}
