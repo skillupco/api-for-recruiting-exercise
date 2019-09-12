@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import db from '../config/db';
 import { IDBRequest, TState } from '../data/requests';
-import { validate } from '@hapi/joi';
 
 export interface IRequest {
 
@@ -25,7 +24,6 @@ export interface IRequestDetails {
   state: TState;
 }
 
-
 const stateActions: { [x: string]: TAction[] } = {
   pending: ['validate', 'delete'],
   validated: ['archive', 'invalidate', 'delete'],
@@ -48,8 +46,7 @@ const getRequestFromId = async (DB = db, id: string): Promise<IRequestDetails | 
   }
 
   return null;
-}
-
+};
 
 const stateChangeRequest = (newState: TState) =>
   async (DB = db, id: string): Promise<{ success: boolean, err?: string }> => {
@@ -85,12 +82,32 @@ const archiveRequest = stateChangeRequest('archived');
 const validateRequest = stateChangeRequest('validated');
 const invalidateRequest = stateChangeRequest('pending');
 
+const deleteRequest = async (DB = db, id: string): Promise<{ success: boolean, err?: string }> => {
+  if (typeof id !== 'string' || id.length === 0) {
+    throw new Error('ID must be a non-empty string');
+  }
+
+  try {
+    const { requests } = await DB.get() as { requests: IDBRequest[] };
+    if (!requests.some((r: IDBRequest) => r.id === id)) {
+      throw new Error('Request not found in database');
+    }
+
+    await DB.set('requests', requests.filter(r => r.id !== id));
+    return { success: true };
+  } catch (err) {
+    return { success: false, err: err.message };
+  }
+};
+
 export interface INewRequestData {
 
 }
+
 const addRequest = async (data: INewRequestData): Promise<string> => {
   return '';
-}
+};
+
 
 export {
   addRequest,
@@ -99,6 +116,7 @@ export {
   getRequestFromId,
   invalidateRequest,
   validateRequest,
+  deleteRequest,
 };
 
 
@@ -109,4 +127,5 @@ export default {
   getRequestFromId,
   invalidateRequest,
   validateRequest,
+  deleteRequest,
 };

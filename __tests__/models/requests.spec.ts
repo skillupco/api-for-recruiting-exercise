@@ -115,4 +115,41 @@ describe('models/requests', () => {
       });
     })
   }
+
+  describe('deleteRequest', () => {
+    let DB: IDB;
+    beforeAll(() => {
+      DB = generateDB({ requests: requestsData });
+    });
+
+    it('should throw if id is invalid', async () => {
+      const expectedErrorMessage = 'ID must be a non-empty string';
+      let actualErrorMessage;
+      try {
+        await Request.deleteRequest(DB, null as string);
+      } catch (err) {
+        actualErrorMessage = err.message;
+      }
+      expect(actualErrorMessage).toEqual(expectedErrorMessage);
+    });
+
+    it('should fail & return an error if id is not found', async () => {
+      const id = 'dumbid';
+      const expectedErrorMessage = 'Request not found in database';
+      const { success, err: actualErrorMessage } = await Request.deleteRequest(DB, id);
+      expect(success).toBeFalsy();
+      expect(actualErrorMessage).toEqual(expectedErrorMessage);
+    });
+
+    it('should return success and effectively delete the request with correct id', async () => {
+      const id = requestsData[0].id;
+      const { success, err: actualErrorMessage } = await Request.deleteRequest(DB, id);
+      expect(success).toBeTruthy();
+      expect(actualErrorMessage).toBeUndefined();
+
+      // Checking if the request has been deleted
+      const [err, requests] = await DB.getFromPath('requests');
+      expect(requests.some(r => r.id === id)).toBeFalsy();
+    });
+  });
 });
