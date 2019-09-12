@@ -2,6 +2,10 @@ import generateDB from '../../src/config/db/generateDB';
 // import { fakeData } from '../utils';
 import { isEmpty, get } from 'lodash';
 
+/**
+ * Some basic tests for generateDB.
+ * It handles the basic equivalence test cases
+ */
 describe('config/generateDB', () => {
   describe('DB', () => {
     it('should throw if given wrong initial data', () => {
@@ -38,9 +42,9 @@ describe('config/generateDB', () => {
   });
 
   describe('DB.get', () => {
-    it('should return an empty object if no initial data', () => {
+    it('should return an empty object if no initial data', async () => {
       const DB = generateDB();
-      expect(isEmpty(DB.get())).toBeTruthy();
+      expect(isEmpty(await DB.get())).toBeTruthy();
     });
 
     it('should return expected data', () => {
@@ -65,29 +69,26 @@ describe('config/generateDB', () => {
       const actualKeys = DB.getKeys();
       expect(actualKeys).toHaveLength(expectedKeys.length);
       for (const key of expectedKeys) {
-        expect(actualKeys.includes(key)).toBeTruthy();
+        expect(actualKeys).toContain(key);
       }
     });
   });
 
   describe('DB.getFromPath', () => {
-    it('should throw if path is invalid', () => {
+    it('should return an error if path is invalid', () => {
       const DB = generateDB();
       const expectedErrorMessage = 'Path should be an non-empty string.';
       for (let invalidArgument of [1, {}, []]) {
-        try {
-          expect(DB.getFromPath(invalidArgument as string));
-          throw new Error('Should not arrive here');
-        } catch (err) {
-          expect(err.message)
-            .toEqual(expectedErrorMessage);
-        }
+        const [err, data] = DB.getFromPath(invalidArgument as string);
+        expect(data).toBeNull();
+        expect(err.message).toEqual(expectedErrorMessage);
       }
     });
 
     it('should return null if no values in path', () => {
       const DB = generateDB();
-      expect(DB.getFromPath('zeaze.azeaz.FDS')).toBeNull();
+      const [err, data] = DB.getFromPath('zeaze.azeaz.FDS');
+      expect(data).toBeNull();
     });
 
     it('should return correct data', () => {
@@ -99,7 +100,8 @@ describe('config/generateDB', () => {
         },
       };
       const DB = generateDB(initialData);
-      const actual = DB.getFromPath('x.y.z');
+      const [err, actual] = DB.getFromPath('x.y.z');
+      expect(err).toBeUndefined();
       expect(actual).toEqual(initialData.x.y.z);
     });
   });
@@ -123,7 +125,7 @@ describe('config/generateDB', () => {
       const [err, res] = await DB.set(path, expectedValue);
       expect(err).toBeNull();
       expect(res.success).toBeTruthy();
-      expect(get(DB.get(), path)).toEqual(expectedValue);
+      expect(get(await DB.get(), path)).toEqual(expectedValue);
     });
   });
 
