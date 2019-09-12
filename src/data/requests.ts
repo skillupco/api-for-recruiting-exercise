@@ -1,7 +1,7 @@
 import uuid from 'uuid/v4';
 
 export type TState = 'pending' | 'validated' | 'archived';
-export type TDev = 'dev' | 'sales' | 'ops' | 'marketing';
+export type TRole = 'dev' | 'sales' | 'ops' | 'marketing';
 
 export interface IDBRequest {
   id: string;
@@ -10,7 +10,7 @@ export interface IDBRequest {
     fullName: string;
     email: string;
     age: number;
-    role: TDev;
+    role: TRole;
   };
   createdAt: number; // milliseconds
   state: TState;

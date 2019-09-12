@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Request, { IRequestDetails } from '../../src/models/requests';
+import Request, { IRequestDetails, INewRequestData } from '../../src/models/requests';
 import requestsData, { IDBRequest } from '../../src/data/requests';
 import generateDB, { IDB } from '../../src/config/db/generateDB';
 import { TState } from '../utils';
@@ -122,7 +122,7 @@ describe('models/requests', () => {
       DB = generateDB({ requests: requestsData });
     });
 
-    it('should throw if id is invalid', async () => {
+    it('should throw if no id is given', async () => {
       const expectedErrorMessage = 'ID must be a non-empty string';
       let actualErrorMessage;
       try {
@@ -150,6 +150,63 @@ describe('models/requests', () => {
       // Checking if the request has been deleted
       const [err, requests] = await DB.getFromPath('requests');
       expect(requests.some(r => r.id === id)).toBeFalsy();
+    });
+  });
+
+  describe('addRequest', () => {
+    let DB: IDB;
+    beforeAll(() => {
+      DB = generateDB({ requests: requestsData });
+    });
+
+    it('should throw if no data is given', async () => {
+      const expectedErrorMessage = 'Data required';
+      let actualErrorMessage;
+      try {
+        await Request.addRequest(DB, undefined);
+      } catch (err) {
+        actualErrorMessage = err.message;
+      }
+      expect(actualErrorMessage).toEqual(expectedErrorMessage);
+    });
+
+    it('should fail and return an error if data is invalid', async () => {
+      const data = {
+        message: '',
+        user: {
+
+        },
+      };
+      const {
+        success,
+        err: actualErrorMessage,
+        id,
+      } = await Request.addRequest(DB, data as INewRequestData);
+      expect(success).toBeFalsy();
+      expect(actualErrorMessage).toEqual('Data must be of INewRequestData format');
+      expect(id).toBeUndefined();
+    });
+
+    it('should success & effectively create a request', async () => {
+      const data: INewRequestData = {
+        message: 'Il faut tester !',
+        state: 'pending',
+        user: {
+          fullName: 'Victor Dupuy',
+          email: 'victor@skillup.co',
+          age: 28,
+          role: 'dev',
+        },
+      };
+      const { success, err, id } = await Request.addRequest(DB, data);
+      expect(success).toBeTruthy();
+      expect(err).toBeUndefined();
+      expect(typeof id).toEqual('string');
+
+      // Check that the request actually exists in DB now.
+      const [_err, requests] = await DB.getFromPath('requests');
+      const newRequest = requests.find((r: IDBRequest) => r.id === id);
+      expect(newRequest).toBeDefined();
     });
   });
 });

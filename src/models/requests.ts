@@ -1,6 +1,8 @@
 import _ from 'lodash';
+import uuid from 'uuid/v4';
+
 import db from '../config/db';
-import { IDBRequest, TState } from '../data/requests';
+import requests, { IDBRequest, TState, TRole } from '../data/requests';
 
 export interface IRequest {
 
@@ -101,11 +103,51 @@ const deleteRequest = async (DB = db, id: string): Promise<{ success: boolean, e
 };
 
 export interface INewRequestData {
-
+  state: TState;
+  user: {
+    fullName: string;
+    email: string;
+    age: number;
+    role: TRole;
+  };
+  message: string;
 }
 
-const addRequest = async (data: INewRequestData): Promise<string> => {
-  return '';
+const getDataValidation = (data) => {
+  return !(
+    !['archived', 'pending', 'validated'].includes(data.state)
+    || _.isEmpty(data.message)
+    || _.isEmpty(data.user)
+    || (_.difference(Object.keys(data.user), ['fullName', 'email', 'age', 'role']).length !== 0)
+  );
+};
+
+const addRequest = async (DB = db, data: INewRequestData): Promise<{ success: boolean, err?: string, id?: string }> => {
+  if (
+    typeof data !== 'object'
+    || !_.isNil(_.get(data, 'length'))
+  ) {
+    throw new Error('Data required');
+  }
+  try {
+    const dataIsValid = getDataValidation(data);
+    if (!dataIsValid) {
+      throw new Error('Data must be of INewRequestData format');
+    }
+    const id = uuid();
+    const [_err, requests] = await DB.getFromPath('requests');
+    await DB.set('requests', [
+      ...requests,
+      {
+        ...data,
+        id,
+        createdAt: new Date().valueOf(),
+      },
+    ]);
+    return { success: true, id };
+  } catch (err) {
+    return { success: false, err: err.message };
+  }
 };
 
 
