@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 /**
- * This is an extremely simple database made just for the sake
+ * This is an extremely dumb "database" made just for the sake
  * of the exercise. It's limited to basic get & set
  * operations.
  * @param initialData
@@ -18,20 +18,27 @@ const generateDB = (initialData = {}) => {
     ...initialData,
   };
 
-  const set = (path, value) => {
+  const set = async (path: string, value) => {
+    let err;
+    let res;
+    if (typeof path !== 'string' || path.length === 0) {
+      err = new Error('Path should be an non-empty string.');
+      return [err];
+    }
     _.set(db, path, value);
+    return [null, { success: true }];
   }
 
   const get = () => db;
 
   const getKeys = () => Object.keys(db);
-  const getFromPath = (path) => {
-    const value = _.get(db, path);
-    if (_.isNil(value)) {
-      throw new ReferenceError('No value found for this path');
-    }
 
-    return value;
+  const getFromPath = (path: string) => {
+    if (typeof path !== 'string' || path.length === 0) {
+      throw new Error('Path should be an non-empty string.');
+    }
+    const value = _.get(db, path, null);
+    return _.get(db, path, null);
   }
 
   return {

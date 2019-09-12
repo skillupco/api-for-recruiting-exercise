@@ -1,6 +1,6 @@
 import generateDB from '../../src/config/db/generateDB';
 // import { fakeData } from '../utils';
-import { isEmpty } from 'lodash';
+import { isEmpty, get } from 'lodash';
 
 describe('config/generateDB', () => {
   describe('DB', () => {
@@ -53,6 +53,7 @@ describe('config/generateDB', () => {
       const DB = generateDB();
       expect(DB.getKeys()).toHaveLength(0);
     });
+
     it('should the expected keys', () => {
       const initialData = {
         x: 1,
@@ -70,8 +71,60 @@ describe('config/generateDB', () => {
   });
 
   describe('DB.getFromPath', () => {
-    it('should throw if path leads to nothing', () => {
-
+    it('should throw if path is invalid', () => {
+      const DB = generateDB();
+      const expectedErrorMessage = 'Path should be an non-empty string.';
+      for (let invalidArgument of [1, {}, []]) {
+        try {
+          expect(DB.getFromPath(invalidArgument as string));
+          throw new Error('Should not arrive here');
+        } catch (err) {
+          expect(err.message)
+            .toEqual(expectedErrorMessage);
+        }
+      }
     });
-  })
+
+    it('should return null if no values in path', () => {
+      const DB = generateDB();
+      expect(DB.getFromPath('zeaze.azeaz.FDS')).toBeNull();
+    });
+
+    it('should return correct data', () => {
+      const initialData = {
+        x: {
+          y: {
+            z: 2,
+          },
+        },
+      };
+      const DB = generateDB(initialData);
+      const actual = DB.getFromPath('x.y.z');
+      expect(actual).toEqual(initialData.x.y.z);
+    });
+  });
+
+  describe('DB.set', () => {
+    it('should return an error if path is invalid', async () => {
+      const DB = generateDB();
+      const expectedErrorMessage = 'Path should be an non-empty string.';
+      for (let invalidArgument of [1, {}, []]) {
+        const [err, res] = await DB.set(invalidArgument as string, 'yo');
+        expect(res).toBeUndefined();
+        expect(err.message)
+          .toEqual(expectedErrorMessage);
+      }
+    });
+
+    it('should create a path if it doesn\'t exist yet', async () => {
+      const path = 'x.y.z';
+      const expectedValue = 'test';
+      const DB = generateDB();
+      const [err, res] = await DB.set(path, expectedValue);
+      expect(err).toBeNull();
+      expect(res.success).toBeTruthy();
+      expect(get(DB.get(), path)).toEqual(expectedValue);
+    });
+  });
+
 });
