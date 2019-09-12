@@ -1,5 +1,6 @@
 import Hapi from '@hapi/hapi';
 import Joi from '@hapi/joi';
+import db from '../config/db';
 
 import {
   // Functions
@@ -17,7 +18,7 @@ const routes = [
     path: '/request/{state}',
     handler: async ({ params: { state } }: Hapi.Request, h: Hapi.ResponseToolkit) => {
       try {
-        const requests = await getRequests(state as TState);
+        const requests = await getRequests(db, state as TState);
         return requests;
       } catch (err) {
         return h.response(err.message || 'Cannot find requests').code(404);
@@ -36,7 +37,7 @@ const routes = [
     path: '/request/action/{id}',
     handler: async ({ params: { state } }: Hapi.Request, h: Hapi.ResponseToolkit) => {
       try {
-        const requests = await getRequestFromId(state as TState);
+        const requests = await getRequestFromId(db, state as TState);
         return requests;
       } catch (err) {
         return h.response(err.message || 'Cannot find requests').code(404);
