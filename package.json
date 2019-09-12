@@ -31,7 +31,8 @@
     "full-icu": "^1.3.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "qs": "^6.8.0"
+    "qs": "^6.8.0",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@types/hapi__hapi": "^18.2.5",

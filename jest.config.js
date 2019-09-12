@@ -13,8 +13,7 @@ module.exports = {
     '^.+\\.js?$': 'ts-jest',
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
-  testRegex: '__tests__/.*.spec.[jt
-  ]s$',
+  testRegex: '__tests__/.*.spec.[jt]s$',
   testPathIgnorePatterns: [
     '/(build|docs|node_modules)/',
   ],
