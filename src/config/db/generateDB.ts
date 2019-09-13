@@ -2,10 +2,10 @@
 import _ from 'lodash';
 
 export interface IDB {
-  get: () => object;
-  getFromPath: (path: string) => any;
-  getKeys: () => string[] | undefined[];
-  set: (path: string, value: any) => Promise<[Error | null, { success: true }?]>;
+  get: () => Promise<object>;
+  getFromPath: (path: string) => Promise<any>;
+  getKeys: () => Promise<string[] | undefined[]>;
+  set: (path: string, value: any) => Promise<{ success: true }>;
 }
 /**
  * This is an extremely dumb "database" made just for the sake
@@ -25,26 +25,23 @@ const generateDB = (initialData = {}): IDB => {
     ...initialData,
   };
 
-  const set = async (path: string, value): Promise<[Error | null, { success: true }?]> => {
-    let err;
+  const set = async (path: string, value): Promise<{ success: true }> => {
     if (typeof path !== 'string' || path.length === 0) {
-      err = new Error('Path should be an non-empty string.');
-      return [err];
+      throw new Error('Path should be an non-empty string.');
     }
     _.set(db, path, value);
-    return [null, { success: true }];
+    return { success: true };
   }
 
   const get = async () => db;
 
-  const getKeys = () => Object.keys(db);
+  const getKeys = async () => Object.keys(db);
 
-  const getFromPath = (path: string) => {
-    let err;
+  const getFromPath = async (path: string) => {
     if (typeof path !== 'string' || path.length === 0) {
-      err = new Error('Path should be an non-empty string.');
+      throw new Error('Path should be an non-empty string.');
     }
-    return [err, _.get(db, path, null)];
+    return _.get(db, path, null);
   }
 
   return {

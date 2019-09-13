@@ -9,7 +9,7 @@
     "start": "backpack dev --icu-data-dir=node_modules/full-icu --inspect=0.0.0.0:9229",
     "build": "backpack build",
     "production": "node --icu-data-dir=node_modules/full-icu build/entry.js",
-    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit",
+    "test": "set NODE_ENV=test && jest --detectOpenHandles --forceExit",
     "lint": "eslint --ext .ts --ext .js src/"
   },
   "lint-staged": {

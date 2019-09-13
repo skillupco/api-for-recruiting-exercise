@@ -47,18 +47,23 @@ describe('config/generateDB', () => {
       expect(isEmpty(await DB.get())).toBeTruthy();
     });
 
-    it('should return expected data', () => {
-      const DB = generateDB({});
+    it('should return expected data', async () => {
+      const initialData = { x: 1, y: 2, z: 'yolo'};
+      const DB = generateDB(initialData);
+      const dbData = await DB.get();
+      for (let [key, value] of Object.entries(initialData)) {
+        expect(value).toEqual(dbData[key]);
+      }
     });
   });
 
   describe('DB.getKeys', () => {
-    it('should return an empty array if no initial data', () => {
+    it('should return an empty array if no initial data', async () => {
       const DB = generateDB();
-      expect(DB.getKeys()).toHaveLength(0);
+      expect(await DB.getKeys()).toHaveLength(0);
     });
 
-    it('should the expected keys', () => {
+    it('should the expected keys', async () => {
       const initialData = {
         x: 1,
         y: 2,
@@ -66,7 +71,7 @@ describe('config/generateDB', () => {
       };
       const DB = generateDB(initialData);
       const expectedKeys = Object.keys(initialData);
-      const actualKeys = DB.getKeys();
+      const actualKeys = await DB.getKeys();
       expect(actualKeys).toHaveLength(expectedKeys.length);
       for (const key of expectedKeys) {
         expect(actualKeys).toContain(key);
@@ -75,23 +80,37 @@ describe('config/generateDB', () => {
   });
 
   describe('DB.getFromPath', () => {
-    it('should return an error if path is invalid', () => {
+    it('should throw an error if path is invalid', async () => {
       const DB = generateDB();
       const expectedErrorMessage = 'Path should be an non-empty string.';
       for (let invalidArgument of [1, {}, []]) {
-        const [err, data] = DB.getFromPath(invalidArgument as string);
-        expect(data).toBeNull();
+        let err;
+        let data;
+        try {
+          data = await DB.getFromPath(invalidArgument as string);
+        } catch(e) {
+          err = e;
+        }
+        // Put the expect here in case it does not throw
+        expect(data).toBeUndefined();
         expect(err.message).toEqual(expectedErrorMessage);
       }
     });
 
-    it('should return null if no values in path', () => {
+    it('should return null if no values in path', async () => {
       const DB = generateDB();
-      const [err, data] = DB.getFromPath('zeaze.azeaz.FDS');
+      let data;
+      let err;
+      try {
+        data = await DB.getFromPath('zeaze.azeaz.FDS');
+      } catch (e) {
+        err = e;
+      }
+      expect(err).toBeUndefined();
       expect(data).toBeNull();
     });
 
-    it('should return correct data', () => {
+    it('should return correct data', async () => {
       const initialData = {
         x: {
           y: {
@@ -100,7 +119,15 @@ describe('config/generateDB', () => {
         },
       };
       const DB = generateDB(initialData);
-      const [err, actual] = DB.getFromPath('x.y.z');
+      let actual;
+      let err;
+
+      try {
+        actual = await DB.getFromPath('x.y.z');
+      } catch (e){
+        err = e;
+      }
+
       expect(err).toBeUndefined();
       expect(actual).toEqual(initialData.x.y.z);
     });
@@ -111,10 +138,16 @@ describe('config/generateDB', () => {
       const DB = generateDB();
       const expectedErrorMessage = 'Path should be an non-empty string.';
       for (let invalidArgument of [1, {}, []]) {
-        const [err, res] = await DB.set(invalidArgument as string, 'yo');
-        expect(res).toBeUndefined();
-        expect(err.message)
-          .toEqual(expectedErrorMessage);
+        let result;
+        let err;
+        try {
+          result = await DB.set(invalidArgument as string, 'yo');
+        } catch (e) {
+          err = e;
+        }
+
+        expect(result).toBeUndefined();
+        expect(err.message).toEqual(expectedErrorMessage);
       }
     });
 
@@ -122,9 +155,16 @@ describe('config/generateDB', () => {
       const path = 'x.y.z';
       const expectedValue = 'test';
       const DB = generateDB();
-      const [err, res] = await DB.set(path, expectedValue);
-      expect(err).toBeNull();
-      expect(res.success).toBeTruthy();
+
+      let err;
+      let result;
+      try {
+        result = await DB.set(path, expectedValue);
+      } catch (e) {
+        err = e;
+      }
+      expect(err).toBeUndefined();
+      expect(result.success).toBeTruthy();
       expect(get(await DB.get(), path)).toEqual(expectedValue);
     });
   });
