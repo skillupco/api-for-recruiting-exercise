@@ -6,14 +6,13 @@ import {
   // Functions
   getRequests,
   addRequest,
-  // Types
-  IRequest,
   getRequestFromId,
-  INewRequestData,
   validateRequest,
   invalidateRequest,
   archiveRequest,
   deleteRequest,
+  // Types
+  INewRequestData,
 } from '../models/requests';
 
 import { TState } from '../data/requests';

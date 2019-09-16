@@ -7,6 +7,7 @@ export interface IDB {
   getKeys: () => Promise<string[] | undefined[]>;
   set: (path: string, value: any) => Promise<{ success: true }>;
 }
+
 /**
  * This is an extremely dumb "database" made just for the sake
  * of the exercise. It's limited to basic get & set

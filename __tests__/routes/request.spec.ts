@@ -1,7 +1,6 @@
 import _ from 'lodash';
 
 import Hapi from '../../src/config/server';
-import Request from '../../src/models/requests';
 import DB from '../../src/config/db';
 
 describe('routes/request', () => {

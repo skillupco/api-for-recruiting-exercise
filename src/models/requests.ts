@@ -2,7 +2,7 @@ import _ from 'lodash';
 import uuid from 'uuid/v4';
 
 import db from '../config/db';
-import requests, { IDBRequest, TState, TRole } from '../data/requests';
+import { IDBRequest, TState, TRole } from '../data/requests';
 
 export interface IRequest {
 
@@ -76,7 +76,7 @@ const stateChangeRequest = (newState: TState) =>
     }));
 
     return { success: true };
-};
+  };
 
 const archiveRequest = stateChangeRequest('archived');
 const validateRequest = stateChangeRequest('validated');
