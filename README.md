@@ -1,6 +1,14 @@
 # api-for-recruiting-exercise
 This API is given to potential recruits so that they can create a little App as a display of their skills.
 
+## How to run id
+#### You need node 12 installed.
+```
+yarn install
+yarn start
+```
+
+You can also run the tests with `yarn test` with the eventual `--verbose` for more details, and `-t describeYouWantToRun` to run one particular "describe" suite.
 ## Routes
 
 ### GET /request/{state}:
