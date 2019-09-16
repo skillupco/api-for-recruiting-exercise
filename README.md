@@ -48,7 +48,7 @@ type IResponse = IRequestDetails;
 ### PATCH /request/archive/{id}
 ### PATCH /request/reopen/{id}
 ### DELETE /request/{id}
-These four routes all take a request's id in parameter, and return { success: true } upon success.
+These five routes all take a request's id in parameter, and return { success: true } upon success.
 They modify the request state.
 
 ```
