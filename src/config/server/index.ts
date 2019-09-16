@@ -5,6 +5,7 @@ import routes from '../../routes';
 
 const {
   API_PORT,
+  API_PORT_TEST,
   API_HOST,
   NODE_ENV,
 } = process.env;
@@ -109,5 +110,5 @@ class HapiServer {
 
 export default new HapiServer({
   host: API_HOST,
-  port: Number(API_PORT),
+  port: Number(NODE_ENV === 'test' ? API_PORT_TEST : API_PORT),
 });
