@@ -51,7 +51,7 @@ describe('routes/request', () => {
         const server = new Hapi.Server();
         const route = requestRoutes.find(r => r.path === '/request/{state}' && r.method === 'GET');
         server.route({
-          ..._.omit(route, 'handler'),
+          ...route,
           handler,
         });
 
