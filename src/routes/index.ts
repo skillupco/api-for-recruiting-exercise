@@ -1,5 +1,5 @@
-import requests from './request';
+import requestRoutes from './request';
 
 export default [
-  ...requests,
+  ...requestRoutes,
 ];
