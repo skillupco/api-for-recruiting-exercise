@@ -65,25 +65,6 @@ describe('routes/request', () => {
         expect(result).toEqual([requests[0]]);
       }
     });
-
-    // it('should return a 200 and a list of requests if given a correct state', async () => {
-    //   const dbRequests = await DB.getFromPath('requests');
-    //   for (let state of ['pending', 'validated', 'archived']) {
-    //     const dbRequestsForState = dbRequests.filter(r => r.state === state);
-    //     const { statusCode, result } = await Server.inject({
-    //       method: 'GET',
-    //       url: `/request/${state}`,
-    //     });
-
-    //     expect(statusCode).toEqual(200);
-    //     expect(result.length).toEqual(dbRequestsForState.length);
-    //     let getId = r => r.id;
-    //     expect(_.difference(
-    //       result.map(getId),
-    //       dbRequestsForState.map(getId),
-    //     ).length).toEqual(0);
-    //   }
-    // });
   });
 
   describe('GET /request/action/{id}', () => {
