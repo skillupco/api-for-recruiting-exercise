@@ -1,11 +1,16 @@
 import _ from 'lodash';
 import uuid from 'uuid/v4';
+import moment from 'moment';
 
 import db from '../config/db';
 import { IDBRequest, TState, TRole } from '../data/requests';
 
 export interface IRequest {
-
+  id: string;
+  createdAt: string;
+  user: IDBRequest['user'];
+  state: TState;
+  message: string;
 }
 
 const getRequests = async (DB = db, state: TState): Promise<IRequest[]> => {
@@ -13,7 +18,10 @@ const getRequests = async (DB = db, state: TState): Promise<IRequest[]> => {
   if (_.isNil(requests)) {
     throw new ReferenceError('No "requests" key found in DB');
   }
-  return requests.filter(r => r.state === state);
+  return requests.filter(r => r.state === state).map(r => ({
+    ...r,
+    createdAt: moment(r.createdAt).format('LL'),
+  }));
 }
 
 type TAction = 'archive'
@@ -22,11 +30,8 @@ type TAction = 'archive'
   | 'reopen'
   | 'validate';
 
-export interface IRequestDetails {
-  id: string;
-  user: IDBRequest['user'];
+export interface IRequestDetails extends IRequest {
   actions: TAction[];
-  state: TState;
 }
 
 const stateActions: { [x: string]: TAction[] } = {
@@ -48,6 +53,7 @@ const getRequestFromId = async (DB = db, id: string): Promise<IRequestDetails> =
   }
   return {
     ...demandedRequest,
+    createdAt: moment(demandedRequest.createdAt).format('LL'),
     actions: stateActions[demandedRequest.state],
   };
 };
