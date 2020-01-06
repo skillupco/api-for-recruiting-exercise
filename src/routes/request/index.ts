@@ -87,6 +87,7 @@ const routes = [
     { path: 'validate/' },
     { path: 'invalidate/' },
     { path: 'archive/' },
+    { path: 'reopen/' },
   ].map(generateStateChangeRoute),
 ];
 

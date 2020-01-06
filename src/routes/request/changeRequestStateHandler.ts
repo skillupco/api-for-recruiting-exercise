@@ -8,6 +8,7 @@ export default ({ validateRequest, invalidateRequest, archiveRequest }, path) =>
         'validate/': validateRequest,
         'invalidate/': invalidateRequest,
         'archive/': archiveRequest,
+        'reopen/': validateRequest,
       }[path];
 
       const { success } = await method(DB, id as string);
