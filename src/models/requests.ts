@@ -20,7 +20,7 @@ const getRequests = async (DB = db, state: TState): Promise<IRequest[]> => {
   }
   return requests.filter(r => r.state === state).map(r => ({
     ...r,
-    createdAt: moment(r.createdAt).format('LL'),
+    createdAt: moment(r.createdAt).format('DD-MM-YYYY'),
   }));
 }
 
