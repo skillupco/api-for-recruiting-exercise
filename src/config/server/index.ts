@@ -2,11 +2,12 @@ import 'dotenv/config';
 import Hapi from '@hapi/hapi';
 
 import routes from '../../routes';
+import plugins from './plugins';
 
 const {
-  API_PORT,
-  API_PORT_TEST,
-  API_HOST,
+  API_PORT = 3000,
+  API_PORT_TEST = 3001,
+  API_HOST = '127.0.0.1',
   NODE_ENV,
 } = process.env;
 
@@ -45,29 +46,9 @@ class HapiServer {
   }
 
   private loadGoodReporterPlugin = async (): Promise<void> => {
-    await this.server.register({
-      plugin: require('@hapi/good'),
-      options: {
-        ops: { interval: 1000 },
-        reporters: {
-          myConsoleReporter: [
-            {
-              module: '@hapi/good-squeeze',
-              name: 'Squeeze',
-              args: [{
-                log: '*',
-                ...(NODE_ENV !== 'test' ? { response: '*' } : {}),
-                error: '*',
-                request: '*',
-              }],
-            }, {
-              module: '@hapi/good-console',
-            },
-            'stdout',
-          ],
-        },
-      },
-    });
+    for (const plugin of plugins) {
+      await this.server.register(plugin);
+    }
   }
 
   private loadPlugins = async (): Promise<void[]> => Promise.all([
@@ -85,9 +66,9 @@ class HapiServer {
 
       await this.server.start();
 
-      if (NODE_ENV !== 'test') {
+      if (!NODE_ENV.includes('test')) {
         const { port, protocol, address } = this.server.info;
-
+        
         console.info(`[Hapi] Running at ${protocol}://${address}:${port}`);
       }
 
@@ -110,5 +91,5 @@ class HapiServer {
 
 export default new HapiServer({
   host: API_HOST,
-  port: Number(NODE_ENV === 'test' ? API_PORT_TEST : API_PORT),
+  port: Number(NODE_ENV.includes('test') ? API_PORT_TEST : API_PORT),
 });

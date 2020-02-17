@@ -1,7 +1,7 @@
 import Good from '@hapi/good';
 
 export default [
-  ...(process.env.NODE_ENV !== 'test' ? [{
+  ...(!process.env.NODE_ENV.includes('test') ? [{
     plugin: Good,
     options: {
       ops: {
